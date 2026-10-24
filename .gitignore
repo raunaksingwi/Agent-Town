@@ -1,0 +1,26 @@
+# python
+__pycache__/
+.venv/
+.pytest_cache/
+*.db
+.env
+
+# node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+.DS_Store
+
+# secrets: never commit these (real values live in Render's dashboard or ~/.modal.toml)
+.env.*
+!.env.example
+.modal.toml
+auth.json
+client_secret*.json
+client-secret*.json
+*.pem
+*.key
+
+# local town (make up)
+backups/
