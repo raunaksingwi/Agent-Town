@@ -1,0 +1,190 @@
+/* The Office look (rooms.tsx): one cabin at a time, instead of the map. Calm and readable: one card per
+   agent, one colour per state (green working, amber wants you, grey asleep), the room's colour on its rug. */
+
+.or-floor { position: fixed; inset: 0; overflow: auto; padding: calc(var(--bar-h) + 12px) 24px 32px; box-sizing: border-box;
+  background-color: #ece9e1; background-image: radial-gradient(#d6d1c4 1px, transparent 1.2px); background-size: 18px 18px;
+  color: #1c1c1a; font-family: var(--read); font-size: 14px; letter-spacing: 0; }
+.or-wrap.side .or-floor { padding-right: calc(var(--dlg-w) + 36px); }
+.or-wrap.docked .or-floor { padding-bottom: 52vh; }
+.or-floor h2 { font-family: var(--read); margin: 0; }
+.or-floor button { font-family: var(--read); font-weight: 600; transform: none !important; box-shadow: none; }
+
+.or-top { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; max-width: 1480px; margin: 0 auto 18px; }
+.or-top h2 { font-size: 22px; font-weight: 600; }
+.or-sub { color: #5c5c57; }
+.or-legend { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #3f3f3b; }
+.or-legend i, .or-pill i { width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; flex: none; }
+.or-legend i.working, .or-pill.working i, .or-pill.awake i { background: #16a34a; }
+.or-legend i.wants, .or-pill.wants i { background: #d97706; }
+.or-floor .or-wanting { height: 36px; padding: 0 14px; border-radius: 10px !important; border: 1px solid #f0c27a !important;
+  background: #fef3c7; color: #7c2d12; }
+
+/* the tabs: All cabins, then a tab per cabin with a count of who wants you */
+.or-tabs { display: flex; align-items: center; gap: 10px; max-width: 1480px; margin: 0 auto 16px; }
+.or-tab-list { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; padding: 2px; min-width: 0; }
+.or-floor :is(.or-tab, .or-all) { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; white-space: nowrap; font-size: 13px;
+  border-radius: 10px !important; border: 1px solid #ddd8cc !important; background: rgba(255,255,255,.7); color: #3f3f3b; }
+.or-floor .or-tab.on { background: #fff; color: #1c1c1a; border-color: color-mix(in srgb, var(--c) 60%, #ddd8cc) !important; box-shadow: inset 0 -3px 0 var(--c); }
+.or-floor .or-all { flex: none; }
+.or-floor .or-all.on { background: #1c1c1a; color: #fff; border-color: #1c1c1a !important; }
+.or-grid-icon { display: grid; grid-template-columns: 5px 5px; gap: 2px; }
+.or-grid-icon i { width: 5px; height: 5px; border-radius: 1px; background: currentColor; }
+.or-tab-wants { min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 9px; background: #d97706; color: #fff; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+
+/* the stage: one cabin, with arrows to the ones either side */
+.or-stage { display: flex; align-items: flex-start; gap: 14px; max-width: 1480px; margin: 0 auto; }
+.or-cabin { flex: 1; min-width: 0; display: flex; justify-content: center; animation: or-in .22s ease-out; }
+@keyframes or-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .or-cabin { animation: none; } }
+.or-floor .or-step { position: sticky; top: calc(50vh - 22px); flex: none; width: 44px; height: 44px; padding: 0; border-radius: 50% !important; font-size: 24px; line-height: 1;
+  border: 1px solid #ddd8cc !important; background: #fff; color: #3f3f3b; box-shadow: 0 4px 12px rgba(30,26,20,.10); }
+.or-floor .or-step:hover { background: #f6f4ef; }
+.or-where { text-align: center; color: #7a7a74; font-size: 12.5px; margin: 14px 0 0; }
+
+/* a cabin: thick walls, windows along the top, a door at the bottom */
+.or-room { --wall: 10px; position: relative; width: 100%; max-width: 1320px; min-height: min(620px, calc(100vh - var(--bar-h) - 190px)); box-sizing: border-box;
+  background: #fbfaf6; border: var(--wall) solid #3d3b36; border-radius: 6px; padding: 26px 30px 24px; display: flex; flex-direction: column; gap: 24px;
+  box-shadow: 0 14px 34px rgba(40,36,28,.14); }
+.or-room::before { content: ""; position: absolute; bottom: calc(-1 * var(--wall)); left: 40px; width: 56px; height: var(--wall); background: #ece9e1; }
+.or-windows { position: absolute; top: calc(-1 * var(--wall)); left: 8%; right: 8%; height: var(--wall); display: flex; justify-content: space-between; pointer-events: none; }
+.or-windows i { width: 7%; background: #cfe0e8; border-top: 2px solid #b8cdd8; box-sizing: border-box; }
+/* the reception: terrazzo, a round rug, the mayor behind a curved desk */
+.or-room.reception { background-color: #f1ece2; background-image: radial-gradient(rgba(120,108,90,.18) 1px, transparent 1.5px), radial-gradient(rgba(255,255,255,.7) 1px, transparent 1.5px);
+  background-size: 11px 11px, 17px 17px; }
+.or-reception { flex: 1; display: flex; align-items: center; gap: 48px; flex-wrap: wrap; justify-content: center; }
+.or-reception-side { flex: 1 1 360px; max-width: 620px; display: flex; flex-direction: column; gap: 18px; }
+.or-room.reception .or-tools { margin-top: 0; padding-right: 0; border-top: 0; padding-top: 0; }
+.or-desk-area { position: relative; display: flex; flex-direction: column; align-items: center; padding: 10px 0 6px; }
+.or-round-rug { position: absolute; left: 50%; top: 50%; width: 290px; height: 290px; transform: translate(-50%, -50%); border-radius: 50%;
+  background: color-mix(in srgb, #8a7a5c 10%, transparent); outline: 1.5px dashed rgba(138,122,92,.35); outline-offset: -10px; }
+.or-desk-area .or-seat { position: relative; z-index: 1; }
+.or-desk { position: relative; width: 250px; height: 40px; margin-top: -14px; border-radius: 0 0 125px 125px / 0 0 40px 40px;
+  background: #b98a5e; box-shadow: inset 0 -6px 0 #a47650, 0 4px 0 rgba(0,0,0,.08); }
+.or-room.empty { background: #f6f3ec; }
+.or-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #6b6b66; }
+.or-plant { position: absolute; right: 14px; bottom: 10px; width: 50px; height: 62px; pointer-events: none; }
+.or-plant.corner.tr { top: 64px; bottom: auto; right: 14px; }
+
+.or-room-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; position: relative; }
+.or-room-head h2 { font-size: 16px; font-weight: 600; }
+.or-swatch { width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex: none; }
+.or-about { font-size: 13px; color: #6b6b66; }
+.or-count { font-size: 12px; color: #6b6b66; font-variant-numeric: tabular-nums; }
+.or-floor .or-post { height: 30px; padding: 0 10px; font-size: 12px; border-radius: 8px !important; border: 1px solid #e0dcd0 !important; background: #fff; color: #3f3f3b; }
+.or-floor .or-post.on { border-color: #e8a13a !important; background: #fef3c7; color: #7c2d12; }
+.or-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #6b6b66; }
+.or-label.gold { color: #8a6a1f; }
+
+/* the table across the middle of the cabin: the lead at its head, the team along its two sides, their cards over its edges */
+.or-table-area { position: relative; flex: 1; display: flex; align-items: center; gap: 22px; padding: 10px 70px 10px 4px; }
+.or-rug { position: absolute; inset: 0 -12px; border-radius: 30px; background: color-mix(in srgb, var(--c) 7%, transparent);
+  outline: 1.5px dashed color-mix(in srgb, var(--c) 28%, transparent); outline-offset: -8px; }
+.or-head { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; flex: none; }
+.or-sides { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.or-side { position: relative; z-index: 1; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.or-side.top { margin-bottom: -20px; align-items: flex-end; flex-wrap: wrap-reverse; }   /* a full row by the table, any extra further out */
+.or-side.bottom { margin-top: -20px; align-items: flex-start; }
+.or-side:empty { min-height: 20px; }
+.or-table { min-height: 120px; margin-right: -46px; border-radius: 24px; background: #e3d3b6; box-shadow: inset 0 0 0 1px #cdb993, inset 0 -6px 0 #d6c29f;
+  display: flex; align-items: center; justify-content: space-around; padding: 0 30px; }
+.or-place { display: flex; flex-direction: column; align-items: center; gap: 30px; }
+.or-laptop { width: 22px; height: 14px; border-radius: 3px; background: #fff; box-shadow: 0 1px 0 #c8b48e; }
+.or-mug { width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 3px #8b6a4a; }
+
+/* an agent's seat: a card you click to talk to it */
+.or-seat { position: relative; width: 196px; box-sizing: border-box; background: #fff; border: 1px solid #e4e2db; border-radius: 14px;
+  padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.05); transition: box-shadow .15s, border-color .15s; }
+.or-seat:hover { border-color: color-mix(in srgb, var(--c) 45%, #e4e2db); box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+.or-seat.wants { border: 2px solid #e8a13a; box-shadow: 0 6px 18px rgba(217,119,6,.18); }
+.or-seat.sel { outline: 3px solid color-mix(in srgb, var(--c) 55%, transparent); outline-offset: 2px; }
+.or-floor .or-seat-open { position: absolute; inset: 0; z-index: 1; border: 0 !important; background: transparent !important; border-radius: 14px !important; padding: 0; cursor: pointer; }
+.or-seat-open:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+.or-who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.or-av { position: relative; width: 46px; height: 46px; flex: none; }
+.or-av svg { display: block; border-radius: 50%; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var(--c); }
+.or-seat.asleep .or-av svg { filter: grayscale(.7); opacity: .75; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #d4d4cf; }
+.or-flag { position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; border-radius: 9px; background: #d97706; border: 2px solid #fff;
+  color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
+.or-names { display: flex; flex-direction: column; min-width: 0; }
+.or-names b { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.or-names small { font-size: 12px; color: #6b6b66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.or-pill { align-self: flex-start; display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 12px;
+  background: #f0f0ee; color: #4b5563; font-size: 12px; font-weight: 600; }
+.or-pill.working, .or-pill.awake { background: #dcfce7; color: #166534; }
+.or-pill.wants { background: #fef3c7; color: #7c2d12; }
+.or-pill.error { background: #fde2e1; color: #9b1c1c; }
+.or-pill.error i { background: #dc2626; }
+.or-line { margin: 0; font-size: 13px; line-height: 1.4; color: #2b2b28; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.or-seat.asleep .or-line { color: #5c5c57; }
+.or-floor .or-reply { position: relative; z-index: 2; height: 36px; border-radius: 9px !important; border: 0 !important; background: #1c1c1a; color: #fff; }
+.or-floor .or-reply:hover { background: #3a3a36; }
+.or-floor .or-spare { width: 196px; min-height: 120px; border-radius: 14px !important; border: 1.5px dashed #c9c6bc !important;
+  background: #fafaf8; color: #5c5c57; font-weight: 500; }
+.or-room.empty .or-spare { width: 100%; min-height: 72px; }
+
+.or-floor :is(.or-wanting, .or-post, .or-spare):hover { filter: brightness(.97); }
+
+/* the apps along the wall */
+.or-tools { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding: 16px 64px 0 0; border-top: 1px solid #ece7db; }
+.or-tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.or-floor .or-tool { position: relative; display: flex; align-items: center; gap: 8px; padding: 8px; text-align: left; min-width: 0;
+  border-radius: 10px !important; border: 1px solid #ece7db !important; background: #fff; color: inherit; font-weight: 500; }
+.or-floor .or-tool:hover { border-color: #cfc8b6 !important; background: #fffdf8; }
+.or-floor .or-tool.sel { border-color: #1c1c1a !important; }
+.or-tool-icon, .or-tool-face { width: 30px; height: 30px; border-radius: 8px; flex: none; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; background: #f1eee6; overflow: hidden; }
+.or-tool-face { border-radius: 50%; }
+.or-tool-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.or-tool-text small { font-size: 11px; color: #6b6b66; }
+.or-tool-name { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.or-dots { display: flex; gap: 3px; }
+.or-dots i { width: 8px; height: 8px; border-radius: 50%; }
+.or-tool-bad { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: #dc2626; }
+
+
+/* All cabins: every cabin as a small plan you click to go in */
+.or-overview { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; max-width: 1480px; margin: 0 auto; }
+.or-floor .or-tile { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; text-align: left; min-height: 210px;
+  border-radius: 4px !important; border: 6px solid #3d3b36 !important; background: #fbfaf6; color: #1c1c1a; font-weight: 500; box-shadow: 0 8px 20px rgba(40,36,28,.10); }
+.or-floor .or-tile:hover { background: #fff; box-shadow: 0 12px 26px rgba(40,36,28,.16); }
+.or-floor .or-tile.here { outline: 3px solid color-mix(in srgb, var(--c) 60%, transparent); outline-offset: 3px; }
+.or-tile-head { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.or-tile-head b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.or-tile-wants { flex: none; padding: 2px 8px; border-radius: 10px; background: #fef3c7; color: #7c2d12; font-size: 11.5px; font-weight: 600; }
+.or-mini { flex: 1; width: 100%; box-sizing: border-box; justify-content: center; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px; background: color-mix(in srgb, var(--c) 8%, transparent); }
+.or-mini-head { flex: none; display: flex; }
+.or-mini-sides { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.or-mini-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; min-height: 30px; }
+.or-mini-table { display: block; height: 16px; border-radius: 8px; background: #e3d3b6; box-shadow: inset 0 0 0 1px #cdb993; }
+.or-mini-face { display: block; flex: none; width: 30px; height: 30px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #c9c6bc; }
+.or-mini-face svg { display: block; }
+.or-mini-face.working, .or-mini-face.awake { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #16a34a; }
+.or-mini-face.wants { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #d97706; }
+.or-mini-face.asleep { filter: grayscale(.7); opacity: .75; }
+.or-mini-desk { margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+.or-mini-desk i { display: block; width: 90px; height: 12px; margin-top: -4px; border-radius: 0 0 45px 45px / 0 0 12px 12px; background: #b98a5e; }
+.or-mini-empty { margin: 0 auto; color: #8a8a84; font-size: 13px; }
+.or-tile-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; color: #6b6b66; }
+.or-tile-apps { display: flex; gap: 4px; font-size: 14px; } .or-tile-apps i { font-style: normal; }
+
+.or-flash { animation: or-flash 1.6s ease-out; }
+@keyframes or-flash { 0%, 40% { box-shadow: 0 0 0 6px rgba(37,99,235,.35); } 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); } }
+
+canvas.city.hidden { visibility: hidden; }
+
+@media (max-width: 700px) {
+  .or-floor { padding: calc(var(--bar-h) + 4px) 12px 24px; }
+  .or-wrap.side .or-floor { padding-right: 12px; padding-bottom: 60vh; }
+  .or-legend { display: none; }
+  .or-floor .or-step { display: none; }                  /* swipe the tabs instead */
+  .or-room { --wall: 6px; padding: 20px 14px 18px; min-height: 0; }
+  .or-table-area { flex-direction: column; align-items: stretch; padding: 4px 0; }
+  .or-table { display: none; }
+  .or-side.top, .or-side.bottom { margin: 0; flex-wrap: wrap; }
+  .or-sides { gap: 12px; }
+  .or-seat, .or-floor .or-spare { width: 100%; }
+  .or-head { align-items: stretch; width: 100%; }
+  .or-plant.corner { display: none; }
+  .or-tools { padding-right: 52px; }
+  .or-overview { grid-template-columns: 1fr; }
+}
