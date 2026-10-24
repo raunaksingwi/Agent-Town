@@ -1,0 +1,50 @@
+[project]
+name = "agent-town-api"
+version = "0.1.0"
+description = "Agent Town API: accounts, agents, MCP tools and the public district"
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.20.0",
+    "anthropic>=1.15.0",
+    "argon2-cffi>=25.1.0",
+    "cryptography>=50.0.2",
+    "fastapi>=0.142.4",
+    "httpx>=0.28.1",
+    "psycopg[binary]>=3.3.6",
+    "pydantic-settings>=2.15.0",
+    "pydantic[email]>=2.13.5",
+    "python-multipart>=0.0.32",
+    "pywebpush>=2.0",
+    "sqlalchemy>=2",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.14",
+]
+modal = [
+    "modal>=1.6.1",
+]
+
+[tool.ruff]
+line-length = 150
+target-version = "py312"
+
+[tool.ruff.lint]
+# Mistakes and dead code, not style: the code is written to be read, and formatting is left alone.
+select = ["E", "F", "I", "B", "UP", "SIM", "S110"]
+ignore = [
+    "B008",   # FastAPI's Depends(...) in defaults is the framework's way
+    "UP017",  # datetime.timezone.utc is spelled out on purpose
+    "E501",   # long lines are allowed where a wrapped one reads worse
+    "E731",   # a lambda bound to a name is fine for a one-line helper
+    "SIM102", "SIM108", "SIM105", "SIM114", "SIM117",  # nested ifs and plain try/except often read better
+    "B904",   # raising inside except without "from" is deliberate where the cause is noise
+    "B007",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S110", "B018", "F811", "E741"]   # fixtures imported for their side effects; pytest's style
+"alembic/*" = ["I", "UP", "E", "F401"]
