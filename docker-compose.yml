@@ -1,0 +1,35 @@
+# Your own Agent Town on your computer, with its data kept between restarts.
+#   make up        first time: makes .env.local (your secret key), builds, starts
+#   make stop    turn it off; make start turns it back on, everything still there
+# Data lives in the Docker volume `agenttown-data` until you delete it on purpose (make destroy).
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: agenttown
+      POSTGRES_USER: agenttown
+      POSTGRES_PASSWORD: ${AGENTTOWN_DB_PASSWORD:?run make up to create .env.local}
+    volumes:
+      - agenttown-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agenttown -d agenttown"]
+      interval: 2s
+      retries: 30
+    # no ports: only the app can reach the database
+
+  app:
+    build: { context: ., target: local }
+    depends_on: { db: { condition: service_healthy } }
+    env_file: ${AGENTTOWN_ENV_FILE:-.env.local}
+    environment:
+      AGENTTOWN_DATABASE_URL: postgresql+psycopg://agenttown:${AGENTTOWN_DB_PASSWORD}@db:5432/agenttown
+      AGENTTOWN_SANDBOX_PROVIDER: local          # agents run inside this container
+      AGENTTOWN_PUBLIC_URL: http://127.0.0.1:8000  # how those agents reach the API: same container
+      AGENTTOWN_COOKIE_SECURE: "false"
+    ports:
+      - "${AGENTTOWN_PORT:-8000}:8000"
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips='*'"
+
+volumes:
+  agenttown-data:

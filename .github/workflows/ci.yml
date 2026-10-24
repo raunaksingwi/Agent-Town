@@ -1,0 +1,61 @@
+# Runs on every pull request (including ones from forks) and every push to main.
+# Read-only: a pull request's code never gets secrets or write access here.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend tests (incl. agent market checks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.12.7"
+      - run: uv sync --locked
+      - run: uv run alembic upgrade head      # migrations apply cleanly to an empty database
+        env:
+          AGENTTOWN_DATABASE_URL: sqlite:///./ci.db
+      - run: uv run ruff check app runner tests
+      - run: uv run pytest -q
+
+  frontend:
+    name: Frontend build and lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build                    # type-checks too
+      - run: npx oxlint src
+
+  docker:
+    name: Production image builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t agenttown:ci .

@@ -1,0 +1,63 @@
+# Agent Town on Render: one web service (API + built frontend) and Postgres.
+# Agents run in Modal Sandboxes, one per chat, started by the web service.
+#
+# Deploy: Render Dashboard → New → Blueprint → this repo. You'll be asked for the two Modal
+# values (modal.com → Settings → API tokens). Everything else is generated or set here.
+# Region and database name can't change after the first deploy; pick before you create it.
+
+databases:
+  - name: agenttown-db
+    plan: basic-256mb
+    region: oregon
+    databaseName: agenttown
+    user: agenttown
+
+services:
+  - type: web
+    name: agenttown
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    preDeployCommand: alembic upgrade head
+    autoDeployTrigger: commit
+    envVars:
+      - key: AGENTTOWN_DATABASE_URL
+        fromDatabase:
+          name: agenttown-db
+          property: connectionString
+      # Encrypts stored model keys and MCP credentials. Generated once; if it ever changes,
+      # every stored credential becomes unreadable and users must add them again.
+      - key: AGENTTOWN_SECRET_KEY
+        generateValue: true
+      - key: AGENTTOWN_COOKIE_SECURE
+        value: "true"
+      - key: AGENTTOWN_API_DOCS
+        value: "false"
+      - key: AGENTTOWN_ALLOW_PRIVATE_MCP_HOSTS
+        value: "false"
+      - key: AGENTTOWN_ALLOW_SUBSCRIPTION_TOKENS
+        value: "true"
+      - key: AGENTTOWN_SANDBOX_PROVIDER
+        value: modal
+      # AGENTTOWN_PUBLIC_URL (how sandboxes reach the API) defaults to RENDER_EXTERNAL_URL.
+      # Set it if you add a custom domain.
+      - key: MODAL_TOKEN_ID
+        sync: false
+      - key: MODAL_TOKEN_SECRET
+        sync: false
+      # Optional: leave blank and Gmail/Calendar or LinkedIn show "not set up on this server".
+      # Redirect URIs to register: <service URL>/api/connect/google/callback and .../linkedin/callback.
+      - key: AGENTTOWN_GOOGLE_CLIENT_ID
+        sync: false
+      - key: AGENTTOWN_GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: AGENTTOWN_LINKEDIN_CLIENT_ID
+        sync: false
+      - key: AGENTTOWN_LINKEDIN_CLIENT_SECRET
+        sync: false
+      # Optional, for a town you run for a few people (README: Signing in with Google), set in the
+      # dashboard: AGENTTOWN_PASSWORD_SIGNUP=false (new accounts only through Google) and
+      # AGENTTOWN_ALLOWED_EMAILS=sam@acme.com,@partner.co (who may make one).
